@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: servicemonitor-routeros-monitoring-dingo-services
+  namespace: monitoring-dingo-services
+spec:
+  endpoints:
+      interval: 30s
+      port: metrics
+      scrapeTimeout: 15s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mktxp

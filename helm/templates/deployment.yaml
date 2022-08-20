@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        app.kubernetes.io/name: mktxp
+    spec:
+      containers:
+        - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
+          name: {{ .Release.Name }}
+          command: ['ash', '-c', 'cp /root/mktxp/mktxp.conf.configmap /root/mktxp/mktxp.conf && mktxp export']
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: metrics
+          volumeMounts:
+            - mountPath: /root/mktxp/mktxp.conf.configmap
+              name: vol-configmap-{{ .Release.Name }}
+              subPath: mktxp.conf
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+      volumes:
+        - name: vol-configmap-{{ .Release.Name }}
+          configMap:
+            name: configmap-{{ .Release.Name }}

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: routeros-monitoring-dingo-services
+  labels:
+    app: routeros-monitoring-dingo-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routeros-monitoring-dingo-services
+  template:
+    metadata:
+      labels:
+        app: routeros-monitoring-dingo-services
+        app.kubernetes.io/name: mktxp
+    spec:
+      containers:
+        - image: martydingo/mktxp
+          name: routeros-monitoring-dingo-services
+          ports:
+            - containerPort: 49090
+              protocol: TCP
+              name: metrics
+          volumeMounts:
+            - mountPath: /mktxp/cli/config/mktxp.conf
+              name: vol-configmap-routeros.monitoring.dingo.services
+              subPath: mktxp.conf
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "512Mi"
+              cpu: "8000m"
+      volumes:
+        - name: vol-configmap-routeros.monitoring.dingo.services
+          configMap:
+            name: configmap-routeros.monitoring.dingo.services

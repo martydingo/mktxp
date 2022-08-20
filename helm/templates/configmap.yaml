@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-{{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+data:
+  mktxp.conf: |
+    [{{ .Values.config.router.name }}]
+        enabled = true         # turns metrics collection for this RouterOS device on / off
+        
+        hostname = {{ .Values.config.router.host }}    # RouterOS IP address
+        port = {{ .Values.config.router.port }}             # RouterOS IP Port
+        
+        username = {{ .Values.config.router.username }}     # RouterOS user, needs to have 'read' and 'api' permissions
+        password = {{ .Values.config.router.password }}
+        
+        use_ssl = {{ .Values.config.router.ssl.enabled }}                 # enables connection via API-SSL servis
+        no_ssl_certificate = False      # enables API_SSL connect without router SSL certificate
+        ssl_certificate_verify = {{ .Values.config.router.ssl.verify }}  # turns SSL certificate verification on / off   
+
+        dhcp = {{ .Values.config.metrics.dhcp }}                     # DHCP general metrics
+        dhcp_lease = {{ .Values.config.metrics.dhcp_lease }}               # DHCP lease metrics
+        pool = {{ .Values.config.metrics.pool }}                     # Pool metrics
+        interface = {{ .Values.config.metrics.interface }}                # Interfaces traffic metrics
+        firewall = {{ .Values.config.metrics.firewall }}                 # Firewall rules traffic metrics
+        monitor = {{ .Values.config.metrics.monitor }}                  # Interface monitor metrics
+        poe = {{ .Values.config.metrics.poe }}                      # POE metrics
+        route = {{ .Values.config.metrics.route }}                    # Routes metrics
+        wireless = {{ .Values.config.metrics.wireless }}                 # WLAN general metrics
+        wireless_clients = {{ .Values.config.metrics.wireless_clients }}         # WLAN clients metrics
+        capsman = {{ .Values.config.metrics.capsman }}                  # CAPsMAN general metrics
+        capsman_clients = {{ .Values.config.metrics.capsman_clients }}          # CAPsMAN clients metrics    
+
+        use_comments_over_names = {{ .Values.config.use_comments_over_names }}  # when available, forces using comments over the interfaces names 
